@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KLASSIFIZIERT</title>
+  <link rel="stylesheet" href="/assets/css/classified.css">
+  <meta name="robots" content="noindex, nofollow">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.15.3/dist/cdn.min.js"></script>
+</head>
+<body class="spy-screen">
+  <main x-data="puzzlePage()" class="classified-container">
+
+    <!-- Header -->
+    <div class="classified-header">
+      <div class="classified-stamp">Klassifiziert</div>
+      <h1>Operation Nachtfalter</h1>
+      <div class="sector-name">Sektor Schattenkabinett</div>
+    </div>
+
+    <!-- Briefing -->
+    <div class="briefing">
+      <p>Agentin,</p>
+      <p>wir haben eine verschlüsselte Nachricht aus Carlos Sandiegos Schattenkabinett abgefangen. Er kommuniziert mit einem Code, den unsere Analysten als einfache Buchstabenverschiebung identifiziert haben.</p>
+      <p>Jeder Buchstabe in seiner Nachricht wurde um eine bestimmte Anzahl von Stellen im Alphabet verschoben.</p>
+      <p>Wie viele Stellen? Carlos ist nicht subtil -- er hat die Zahl in seinem eigenen Namen versteckt. Zählen Sie die Buchstaben in &laquo;CARLOS&raquo;.</p>
+      <p>Entschlüsseln Sie die Nachricht und geben Sie das <strong style="color: var(--accent-amber);">LETZTE WORT</strong> der entschlüsselten Nachricht ein.</p>
+      <p class="signature">-- Dein Händler</p>
+    </div>
+
+    <!-- Cipher Text Display -->
+    <div class="cipher-display">GHMKLGTMKT -- IGXRUY MKNKOS
+
+&laquo;Jok Jgzkt, jok oin yzgnr, yotj lakx
+kotkt mgtf hkyzossszkt Zgm hkyzossz.
+Koty cgx otzkxkyygtzkx gry grrky -- jok
+Tginxoinz. Yok cakxjk soin yknx lxkakt.
+Ghkx onx Otngrz? Fkoz. Fkoz oyz jgy
+ckxzburryzk Mkyinktq.&raquo;</div>
+
+    <!-- Caesar Cipher Reference Table -->
+    <p style="font-size: 0.8rem; color: var(--accent-amber); margin-bottom: 0.5rem; letter-spacing: 0.1em; text-transform: uppercase;">Caesar-Entschlüsselungshilfe (Verschiebung: 6)</p>
+    <div class="cipher-table-wrapper">
+      <table class="cipher-table">
+        <tr>
+          <td class="label-cell">Verschl.:</td>
+          <th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th><th>H</th><th>I</th><th>J</th><th>K</th><th>L</th><th>M</th><th>N</th><th>O</th><th>P</th><th>Q</th><th>R</th><th>S</th><th>T</th><th>U</th><th>V</th><th>W</th><th>X</th><th>Y</th><th>Z</th>
+        </tr>
+        <tr>
+          <td class="label-cell">Original:</td>
+          <td>U</td><td>V</td><td>W</td><td>X</td><td>Y</td><td>Z</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td><td>H</td><td>I</td><td>J</td><td>K</td><td>L</td><td>M</td><td>N</td><td>O</td><td>P</td><td>Q</td><td>R</td><td>S</td><td>T</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Answer Input (hidden when solved) -->
+    <div x-show="!solved" class="code-entry">
+      <label style="font-size: 0.8rem; color: var(--accent-green); letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: 0.5rem;">
+        Letztes Wort der entschlüsselten Nachricht:
+      </label>
+      <input
+        x-model="answer"
+        @keydown.enter="checkAnswer()"
+        type="text"
+        placeholder="Letztes Wort eingeben..."
+        class="input-terminal"
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
+      >
+      <button @click="checkAnswer()" class="btn-classified">
+        Entschlüsseln
+      </button>
+    </div>
+
+    <!-- Access Denied -->
+    <p x-show="denied" x-transition class="access-denied">
+      Zugriff verweigert -- Entschlüsselung fehlgeschlagen
+    </p>
+
+    <!-- Access Granted -->
+    <div x-show="solved" x-transition class="access-granted">
+      <h2>Zugriff gewährt</h2>
+      <p>Entschlüsselung erfolgreich. Carlos spricht von einem &laquo;Geschenk&raquo; und einem &laquo;bestimmten Tag&raquo;. Die gestohlenen Daten hängen mit einem persönlichen Anlass zusammen.</p>
+      <p>Unsere Triangulation zeigt den nächsten Operationspunkt:</p>
+      <a :href="nextUrl">Nächster Sektor &rarr;</a>
+      <p style="margin-top: 1rem; font-size: 0.85rem; color: rgba(224,216,200,0.6);">Agentin, wir sind nah dran. Carlos weiß es vielleicht schon. Seien Sie vorsichtig.</p>
+      <p class="signature" style="color: var(--accent-green); font-style: italic;">-- Dein Händler</p>
+    </div>
+
+    <!-- Hint System -->
+    <div x-show="!solved" class="hint-section">
+      <div class="hint-label">Unterstützung</div>
+
+      <!-- Tier 1 Button -->
+      <button x-show="hintTier === 0" @click="hintTier = 1" class="btn-classified btn-hint">
+        Hilfe anfordern
+      </button>
+
+      <!-- Tier 1: Handler nudge -->
+      <div x-show="hintTier >= 1" x-transition class="handler-message">
+        <img src="/akte-nachtfalter/assets/ep01/images/handler-avatar.webp" class="avatar" alt="Händler" loading="lazy" onerror="this.style.display='none'">
+        <p>&laquo;Agentin, hier ist dein Händler. Äh... die Analyse zeigt: Es handelt sich um eine Caesar-Verschlüsselung. Jeder Buchstabe ist um eine bestimmte Zahl verschoben. Lesen Sie den Briefing-Text nochmal -- die Zahl steckt in Carlos' eigenem Namen. Zählen Sie einfach die Buchstaben.&raquo;</p>
+      </div>
+
+      <!-- Tier 2 Button -->
+      <button x-show="hintTier === 1" @click="hintTier = 2" class="btn-classified btn-hint">
+        Weitere Hilfe
+      </button>
+
+      <!-- Tier 2: Handler clearer -->
+      <div x-show="hintTier >= 2" x-transition class="handler-message">
+        <img src="/akte-nachtfalter/assets/ep01/images/handler-avatar.webp" class="avatar" alt="Händler" loading="lazy" onerror="this.style.display='none'">
+        <p>&laquo;Dein Händler nochmal. Also, C-A-R-L-O-S hat sechs Buchstaben. Das bedeutet, Verschiebung um 6. G wird zu A, H wird zu B, I wird zu C, und so weiter. Das letzte Wort der entschlüsselten Nachricht ist Ihre Antwort. Es geht um etwas, das man jemandem gibt.&raquo;</p>
+      </div>
+
+      <!-- Tier 3 Button -->
+      <button x-show="hintTier === 2" @click="hintTier = 3" class="btn-classified btn-danger">
+        Notfall-Entschlüsselung
+      </button>
+
+      <!-- Tier 3: Carlos taunt -->
+      <div x-show="hintTier >= 3" x-transition class="carlos-message">
+        <img src="/assets/shared/carlos-avatar.webp" class="avatar" alt="C.S. -- Überwachungsaufnahme" loading="lazy">
+        <p>&laquo;Ach, Agentin. Mein kleiner Caesar-Code war wohl zu viel für dich? Dabei habe ich die Lösung praktisch in den Briefing-Text geschrieben. Na gut: Das letzte Wort ist GESCHENK. Ja, ein Geschenk. Und was für eins -- du hast ja keine Ahnung. Haha.&raquo;</p>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Puzzle 2: Schattenkabinett (Caesar Cipher)
+    // Answer: geschenk
+    // SHA-256 of "geschenk": 594af0843ae8e559b723a6ada3a569832af8026da0c7117557dd075a091ff146
+    function puzzlePage() {
+      return {
+        answer: '',
+        denied: false,
+        solved: false,
+        hintTier: 0,
+        correctHash: '594af0843ae8e559b723a6ada3a569832af8026da0c7117557dd075a091ff146',
+        nextUrl: '/akte-nachtfalter/spiegelsaal/',
+
+        async checkAnswer() {
+          if (!this.answer.trim()) return;
+          this.denied = false;
+          const normalized = this.answer.trim().toLowerCase().replace(/\s+/g, '');
+          const msgUint8 = new TextEncoder().encode(normalized);
+          const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+          if (hashHex === this.correctHash) {
+            this.solved = true;
+          } else {
+            this.denied = true;
+            setTimeout(() => { this.denied = false; }, 3000);
+          }
+        }
+      }
+    }
+  </script>
+</body>
+</html>

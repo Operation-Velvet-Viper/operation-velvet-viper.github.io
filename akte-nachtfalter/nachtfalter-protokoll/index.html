@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STRENG GEHEIM: NACHTFALTER-PROTOKOLL</title>
+  <link rel="stylesheet" href="/assets/css/classified.css">
+  <meta name="robots" content="noindex, nofollow">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.15.3/dist/cdn.min.js"></script>
+</head>
+<body class="birthday-transition" x-data="birthdayPage()" :class="bodyClass">
+  <main class="birthday-container">
+
+    <!-- Phase 1: Classified Document Opening -->
+    <section class="phase-classified-text" x-show="phase >= 1" x-transition>
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <div class="classified-stamp" x-show="phase < 4">Streng Geheim</div>
+        <div class="birthday-stamp" x-show="phase >= 4" x-transition style="display: block;">Alles Gute</div>
+      </div>
+
+      <div class="doc-header" x-show="phase < 3">
+        NACHTFALTER-PROTOKOLL<br>
+        AKTENZEICHEN: VV-2026-NF-FINAL<br><br>
+        STATUS: DATEN WIEDERHERGESTELLT<br>
+        KLASSIFIZIERUNG: AUFGEHOBEN<br><br>
+        BETREFF: Abgefangene persönliche Nachricht<br>
+        ABSENDER: <span class="redacted" :class="{ 'revealed': phase >= 3 }">Marcel</span><br>
+        EMPFÄNGER: Agentin <span class="redacted" :class="{ 'revealed': phase >= 3 }">Lydia</span><br>
+        DATUM: 06.02.2026<br><br>
+        Die folgenden Daten wurden aus Carlos Sandiegos<br>
+        Netzwerk extrahiert und wiederhergestellt.<br><br>
+        Es handelt sich um eine persönliche Nachricht.
+      </div>
+
+      <div class="separator" x-show="phase >= 1">====================</div>
+      <p style="text-align: center; font-size: 0.85rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(224,216,200,0.5); margin-bottom: 1.5rem;" x-show="phase >= 1">
+        Nachricht beginnt
+      </p>
+      <div class="separator" x-show="phase >= 1">====================</div>
+    </section>
+
+    <!-- Phase 2: Transition -->
+    <section class="phase-transition-text" x-show="phase >= 2" x-transition>
+      <p>Liebe Agentin,</p>
+      <p>nein -- Moment. Lass mich das nochmal anfangen. Die Aktenzeichen und Klassifizierungen können wir jetzt weglassen, oder?</p>
+    </section>
+
+    <!-- Phase 3: Personal Birthday Message -->
+    <section class="phase-personal-text" x-show="phase >= 3" x-transition>
+      <p>Liebe Lydia,</p>
+
+      <p>die Wahrheit ist: Es gab nie gestohlene Daten. Oder doch: irgendwie schon. Carlos hat diese Nachricht „gestohlen", weil ich sie nicht einfach so verschicken wollte. Ich wollte, dass du sie ermittelst. Dass der Weg hierher genauso besonders ist wie du.</p>
+
+      <p>Also:</p>
+
+      <p class="greeting">Alles Liebe zum Geburtstag,</p>
+
+      <p>Ich bewundere so vieles an dir. Deine Neugier, die dich bis hierher gebracht hat. Durch Akrostichons und Caesar-Codes und Surveillance-Fotos. Deine Klugheit, deinen Humor, die Art, wie du über Dinge nachdenkst und sie von allen Seiten betrachtest, bevor du dir eine Meinung bildest.</p>
+
+      <p>Was ich für dich empfinde, dafür finde ich keine Worte, es passt nicht in einen Absatz. Aber in eine Schnitzeljagd? Vielleicht.</p>
+
+      <p>Ich hoffe, dieser kleine Ausflug in die Welt der Geheimagenten hat dir Spaß gemacht. Mir jedenfalls war es eine Freude, diese Experience für dich zu schreiben. Mit jeder Story, jedem Rätsel, jedem Hinweis fühle ich mich dir näher.</p>
+
+      <p>Und das Beste? Das hier ist erst der Anfang. So du willst... neue Missionen, neue Rätsel, neue Überraschungen. Und du kannst mitgestalten: Sag mir, was dir gefallen hat, was zu leicht war, was zu schwer, was du dir wünschst. Das hier kann UNSER Abenteuer werden.</p>
+
+      <p>Auf ein wunderbares, nährendes neues Lebensjahr. Und auf viele, viele weitere Missionen.</p>
+
+      <p class="sign-off">Marcel</p>
+
+      <p class="ps">P.S. Carlos lässt grüßen. Er sagt, du warst eine würdige Gegnerin. Aber er ist noch nicht fertig mit dir...</p>
+    </section>
+
+    <!-- Continue Button -->
+    <a x-show="phase >= 4" x-transition href="/akte-nachtfalter/echo-null/" class="btn-continue">
+      Weiter...
+    </a>
+
+    <!-- Scroll trigger: advance phases as user scrolls / reads -->
+    <div style="height: 1px;" x-intersect.once="advanceToEnd()"></div>
+
+  </main>
+
+  <script>
+    function birthdayPage() {
+      return {
+        phase: 0,
+        bodyClass: '',
+
+        init() {
+          // Phase 1: Show classified opening immediately
+          setTimeout(() => { this.phase = 1; }, 500);
+
+          // Phase 2: Transition text after reading time
+          setTimeout(() => {
+            this.phase = 2;
+            this.bodyClass = 'phase-warm';
+          }, 3000);
+
+          // Phase 3: Personal message
+          setTimeout(() => {
+            this.phase = 3;
+            this.bodyClass = 'phase-personal';
+          }, 6000);
+
+          // Phase 4: Full warmth + stamp change + continue button
+          setTimeout(() => {
+            this.phase = 4;
+          }, 9000);
+        },
+
+        advanceToEnd() {
+          // If user scrolls to bottom before timers, fast-forward
+          if (this.phase < 4) {
+            this.phase = 4;
+            this.bodyClass = 'phase-personal';
+          }
+        }
+      }
+    }
+  </script>
+</body>
+</html>

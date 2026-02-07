@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KLASSIFIZIERT</title>
+  <link rel="stylesheet" href="/assets/css/classified.css">
+  <meta name="robots" content="noindex, nofollow">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.15.3/dist/cdn.min.js"></script>
+</head>
+<body class="spy-screen">
+  <main x-data="puzzlePage()" class="classified-container">
+
+    <!-- Header -->
+    <div class="classified-header">
+      <div class="classified-stamp">Klassifiziert</div>
+      <h1>Operation Nachtfalter</h1>
+      <div class="sector-name">Sektor Frequenz Sieben</div>
+    </div>
+
+    <!-- Briefing -->
+    <div class="briefing">
+      <p>Agentin,</p>
+      <p>willkommen in der Operationszentrale. Unser Team hat eine verschlüsselte Audioübertragung abgefangen, die Carlos Sandiego an einen unbekannten Kontakt gesendet hat.</p>
+      <p>In der Übertragung beschreibt Carlos einen Gegenstand -- etwas, das er gestohlen oder versteckt hat. Wir müssen wissen, wovon er spricht.</p>
+      <p>Hören Sie sich die Übertragung an und geben Sie Ihre Analyse ein.</p>
+      <p>Die gestohlenen persönlichen Daten befinden sich vermutlich in der Nähe dieses Gegenstands.</p>
+      <p class="signature">-- Dein Händler</p>
+    </div>
+
+    <!-- Audio Section -->
+    <div class="audio-section">
+      <div x-show="!audioPlaying" class="intercepted-transmission">
+        <div class="classified-stamp">Abgefangene Übertragung</div>
+        <p style="margin-top: 1rem;">Verschlüsselte Audiodatei erkannt. Zum Abspielen antippen.</p>
+        <button @click="$refs.audio.play().catch(()=>{}); audioPlaying = true" class="btn-classified">
+          Übertragung entschlüsseln
+        </button>
+      </div>
+      <div x-show="audioPlaying" x-transition>
+        <p style="font-size: 0.8rem; color: var(--accent-amber); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem;">Abgefangene Übertragung -- Quelle: C.S.</p>
+        <audio x-ref="audio" controls class="audio-player">
+          <source src="/akte-nachtfalter/assets/ep01/audio/audio-riddle.mp3" type="audio/mpeg">
+          Ihr Browser unterstützt kein Audio.
+        </audio>
+      </div>
+    </div>
+
+    <!-- Answer Input (hidden when solved) -->
+    <div x-show="!solved" class="code-entry">
+      <label style="font-size: 0.8rem; color: var(--accent-green); letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: 0.5rem;">
+        Analyse eingeben:
+      </label>
+      <input
+        x-model="answer"
+        @keydown.enter="checkAnswer()"
+        type="text"
+        placeholder="Gegenstand eingeben..."
+        class="input-terminal"
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
+      >
+      <button @click="checkAnswer()" class="btn-classified">
+        Entschlüsseln
+      </button>
+    </div>
+
+    <!-- Access Denied -->
+    <p x-show="denied" x-transition class="access-denied">
+      Zugriff verweigert -- Analyse fehlgeschlagen
+    </p>
+
+    <!-- Access Granted -->
+    <div x-show="solved" x-transition class="access-granted">
+      <h2>Zugriff gewährt</h2>
+      <p>Signaturanalyse bestätigt. Die Daten wurden lokalisiert.</p>
+      <p>Carlos Sandiego hat weitere verschlüsselte Nachrichten hinterlassen. Unsere Analysten haben den nächsten Operationspunkt identifiziert.</p>
+      <p>Begeben Sie sich zu:</p>
+      <a :href="nextUrl">Nächster Sektor &rarr;</a>
+      <p style="margin-top: 1rem; font-size: 0.85rem; color: rgba(224,216,200,0.6);">Die gestohlenen Daten sind nahe. Bleiben Sie wachsam.</p>
+      <p class="signature" style="color: var(--accent-green); font-style: italic;">-- Dein Händler</p>
+    </div>
+
+    <!-- Hint System -->
+    <div x-show="!solved" class="hint-section">
+      <div class="hint-label">Unterstützung</div>
+
+      <!-- Tier 1 Button -->
+      <button x-show="hintTier === 0" @click="hintTier = 1" class="btn-classified btn-hint">
+        Hilfe anfordern
+      </button>
+
+      <!-- Tier 1: Handler nudge -->
+      <div x-show="hintTier >= 1" x-transition class="handler-message">
+        <img src="/akte-nachtfalter/assets/ep01/images/handler-avatar.webp" class="avatar" alt="Händler" loading="lazy" onerror="this.style.display='none'">
+        <p>&laquo;Agentin, unsere Analysten haben die Übertragung ausgewertet. Hier ist dein Händler. Äh... Fokussieren Sie sich auf den Teil, in dem Carlos sagt, man würde sich selbst darin sehen. Was hat diese Eigenschaft? Es ist ein alltäglicher Gegenstand. Etwas, das Sie wahrscheinlich heute schon benutzt haben.&raquo;</p>
+      </div>
+
+      <!-- Tier 2 Button -->
+      <button x-show="hintTier === 1" @click="hintTier = 2" class="btn-classified btn-hint">
+        Weitere Hilfe
+      </button>
+
+      <!-- Tier 2: Handler clearer -->
+      <div x-show="hintTier >= 2" x-transition class="handler-message">
+        <img src="/akte-nachtfalter/assets/ep01/images/handler-avatar.webp" class="avatar" alt="Händler" loading="lazy" onerror="this.style.display='none'">
+        <p>&laquo;Dein Händler nochmal. Also, äh... technisch gesehen: Der Gegenstand reflektiert Licht, zeigt ein Abbild, und es gibt ihn in verschiedenen Größen. An der Wand, auf dem Tisch, in der Tasche. Sie kennen ihn. Sie benutzen ihn vermutlich jeden Morgen. Es reimt sich auf... nein, das wäre zu offensichtlich. Aber denken Sie an Reflexion.&raquo;</p>
+      </div>
+
+      <!-- Tier 3 Button -->
+      <button x-show="hintTier === 2" @click="hintTier = 3" class="btn-classified btn-danger">
+        Notfall-Entschlüsselung
+      </button>
+
+      <!-- Tier 3: Carlos taunt -->
+      <div x-show="hintTier >= 3" x-transition class="carlos-message">
+        <img src="/assets/shared/carlos-avatar.webp" class="avatar" alt="C.S. -- Überwachungsaufnahme" loading="lazy">
+        <p>&laquo;Oh, kleine Detektivin. Du hörst meine Worte und verstehst sie nicht? Ich rede von einem SPIEGEL. S-P-I-E-G-E-L. Einem ganz normalen Spiegel. Schau mal rein -- vielleicht siehst du darin ja, wie nah du an den gestohlenen Daten bist. Oder wie weit weg. Haha.&raquo;</p>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Puzzle 1: Frequenz Sieben (Audio Riddle)
+    // Answer: spiegel
+    // SHA-256 of "spiegel": cb3ae634eb203d73e890f95632b6abc8359312ad87e94860e18d9aa2fd09dfe3
+    function puzzlePage() {
+      return {
+        answer: '',
+        denied: false,
+        solved: false,
+        hintTier: 0,
+        audioPlaying: false,
+        correctHash: 'cb3ae634eb203d73e890f95632b6abc8359312ad87e94860e18d9aa2fd09dfe3',
+        nextUrl: '/akte-nachtfalter/schattenkabinett/',
+
+        async checkAnswer() {
+          if (!this.answer.trim()) return;
+          this.denied = false;
+          const normalized = this.answer.trim().toLowerCase().replace(/\s+/g, '');
+          const msgUint8 = new TextEncoder().encode(normalized);
+          const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+          if (hashHex === this.correctHash) {
+            this.solved = true;
+          } else {
+            this.denied = true;
+            setTimeout(() => { this.denied = false; }, 3000);
+          }
+        }
+      }
+    }
+  </script>
+</body>
+</html>

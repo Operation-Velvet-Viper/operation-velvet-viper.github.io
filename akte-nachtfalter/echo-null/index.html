@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EINGEHENDE ÜBERTRAGUNG</title>
+  <link rel="stylesheet" href="/assets/css/classified.css">
+  <meta name="robots" content="noindex, nofollow">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.15.3/dist/cdn.min.js"></script>
+</head>
+<body class="echo-null">
+  <main x-data="teaserPage()" class="echo-container">
+
+    <!-- Transmission Header -->
+    <div class="transmission-header">Eingehende Übertragung</div>
+    <div class="transmission-source">
+      Quelle: Unbekannt<br>
+      Signatur: C.S.
+    </div>
+
+    <!-- Carlos Avatar -->
+    <img
+      src="/assets/shared/carlos-avatar.webp"
+      alt="C.S. -- Überwachungsaufnahme"
+      class="carlos-avatar-large"
+      loading="lazy"
+    >
+
+    <div class="dots">.....</div>
+
+    <!-- Carlos Teaser Text with delayed typewriter reveal -->
+    <div class="carlos-text">
+      <div :style="{ 'animation-delay': '0.5s' }" class="typewriter-block" x-show="line >= 1" x-transition>
+        <p>Agentin.</p>
+      </div>
+
+      <div :style="{ 'animation-delay': '1s' }" class="typewriter-block" x-show="line >= 2" x-transition>
+        <p>Glückwunsch. Du hast meine kleine Prüfung bestanden. Die Nachricht -- ja, ich habe sie abgefangen. Schuldig im Sinne der Anklage.</p>
+      </div>
+
+      <div :style="{ 'animation-delay': '1.5s' }" class="typewriter-block" x-show="line >= 3" x-transition>
+        <p>Aber lass mich dir etwas sagen: Das war erst die Aufwärmung.</p>
+      </div>
+
+      <div :style="{ 'animation-delay': '2s' }" class="typewriter-block" x-show="line >= 4" x-transition>
+        <p>Du hast Talent. Echtes Talent. Die meisten Agenten hätten beim Caesar-Code aufgegeben. Du nicht. Das gefällt mir.</p>
+      </div>
+
+      <div :style="{ 'animation-delay': '2.5s' }" class="typewriter-block" x-show="line >= 5" x-transition>
+        <p>Und deshalb habe ich eine Frage an dich:</p>
+      </div>
+
+      <div :style="{ 'animation-delay': '3s' }" class="typewriter-block" x-show="line >= 6" x-transition>
+        <p>Was, wenn das nächste Mal die Einsätze höher sind? Was, wenn es nicht nur um eine Nachricht geht, sondern um etwas... Größeres?</p>
+      </div>
+
+      <div :style="{ 'animation-delay': '3.5s' }" class="typewriter-block" x-show="line >= 7" x-transition>
+        <p>Ich habe Pläne, Agentin. Große Pläne. Und seltsamerweise... spielst du darin eine Rolle.</p>
+      </div>
+
+      <div :style="{ 'animation-delay': '4s' }" class="typewriter-block" x-show="line >= 8" x-transition>
+        <p>Wir sehen uns.</p>
+      </div>
+
+      <div x-show="line >= 9" x-transition class="carlos-sig">-- C.S.</div>
+
+      <div :style="{ 'animation-delay': '4.5s' }" class="typewriter-block" x-show="line >= 10" x-transition>
+        <p style="font-size: 0.85rem; color: rgba(224,216,200,0.5); margin-top: 1.5rem;">P.S. Dein Händler -- dieses kleine rosa Ding -- hat keine Ahnung, was als Nächstes kommt. Aber du wirst es herausfinden. Früh genug.</p>
+      </div>
+    </div>
+
+    <div class="dots" x-show="line >= 11" x-transition>.....</div>
+
+    <!-- Transmission End -->
+    <div x-show="line >= 11" x-transition>
+      <div class="transmission-end">Übertragung beendet</div>
+      <div class="next-mission">Nächste Mission: [Ausstehend]</div>
+    </div>
+
+    <!-- Footer -->
+    <div class="episode-footer" x-show="line >= 11" x-transition>
+      operation velvet viper -- episode 1 complete
+    </div>
+
+  </main>
+
+  <script>
+    function teaserPage() {
+      return {
+        line: 0,
+
+        init() {
+          // Reveal lines progressively with typewriter timing
+          const delays = [500, 2000, 4000, 5500, 7500, 9000, 11000, 13500, 15000, 16500, 18500];
+          delays.forEach((delay, index) => {
+            setTimeout(() => {
+              this.line = index + 1;
+            }, delay);
+          });
+        }
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KLASSIFIZIERT</title>
+  <link rel="stylesheet" href="/assets/css/classified.css">
+  <meta name="robots" content="noindex, nofollow">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.15.3/dist/cdn.min.js"></script>
+</head>
+<body class="spy-screen">
+  <main x-data="puzzlePage()" class="classified-container">
+
+    <!-- Header -->
+    <div class="classified-header">
+      <div class="classified-stamp">Klassifiziert</div>
+      <h1>Operation Nachtfalter</h1>
+      <div class="sector-name">Sektor Spiegelsaal</div>
+    </div>
+
+    <!-- Briefing -->
+    <div class="briefing">
+      <p>Agentin,</p>
+      <p>das ist es. Wir haben es bis in Carlos Sandiegos geheimes Archiv geschafft -- den Spiegelsaal.</p>
+      <p>Unser Überwachungsteam hat ein Foto aus dem Inneren geschleust. Auf diesem Foto befindet sich ein Hinweis auf den finalen Standort der gestohlenen Daten.</p>
+      <p>Carlos hat sich einen letzten Spaß erlaubt: Er hat das Passwort für die gestohlene Datei auf einem Kalenderblatt notiert, das im Foto sichtbar ist.</p>
+      <p>Finden Sie das Datum auf dem Kalenderblatt. Geben Sie es im Format <strong style="color: var(--accent-amber);">TT.MM.</strong> ein (z.B. 14.03.)</p>
+      <p>Die Uhr tickt. Wir müssen wissen, wann die Daten übergeben werden sollten -- oder für WANN sie bestimmt waren.</p>
+      <p class="signature">-- Dein Händler</p>
+      <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-classified); font-style: italic;">NACHTRAG: Die Signaturanalyse zeigt, dass die gestohlenen Daten für SIE bestimmt waren, Agentin. Persönlich. Für Sie. Für heute.</p>
+    </div>
+
+    <!-- Evidence Image -->
+    <img
+      src="/akte-nachtfalter/assets/ep01/images/spiegelsaal-evidence.webp"
+      alt="Surveillance-Foto aus dem Spiegelsaal"
+      class="evidence-image"
+      loading="lazy"
+      onerror="this.style.display='none'; document.getElementById('image-fallback').style.display='block';"
+    >
+    <div id="image-fallback" style="display:none; border: 1px dashed var(--accent-amber); padding: 2rem; text-align: center; margin: 1.5rem 0;">
+      <p style="color: var(--accent-amber); font-size: 0.85rem;">[Surveillance-Foto wird geladen...]</p>
+      <p style="color: rgba(224,216,200,0.4); font-size: 0.75rem; margin-top: 0.5rem;">Hinweis: Suchen Sie nach dem Kalenderblatt im Bild.</p>
+    </div>
+    <p class="evidence-caption">Überwachungsaufnahme -- Spiegelsaal, Archiv C.S.</p>
+
+    <!-- Answer Input (hidden when solved) -->
+    <div x-show="!solved" class="code-entry">
+      <label style="font-size: 0.8rem; color: var(--accent-green); letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: 0.5rem;">
+        Datum eingeben (Format: TT.MM.):
+      </label>
+      <input
+        x-model="answer"
+        @keydown.enter="checkAnswer()"
+        type="text"
+        placeholder="TT.MM."
+        class="input-terminal"
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
+      >
+      <button @click="checkAnswer()" class="btn-classified">
+        Entschlüsseln
+      </button>
+    </div>
+
+    <!-- Access Denied -->
+    <p x-show="denied" x-transition class="access-denied">
+      Zugriff verweigert -- Falsches Datum
+    </p>
+
+    <!-- Access Granted -->
+    <div x-show="solved" x-transition class="access-granted">
+      <h2>Zugriff gewährt</h2>
+      <p>Datum bestätigt: 06.02. -- Heute.</p>
+      <p>Die gestohlenen Daten waren für heute bestimmt. Für diesen Tag. Für SIE.</p>
+      <p>Carlos Sandiego hat etwas gestohlen, das für Sie persönlich bestimmt war. An Ihrem Geburtstag.</p>
+      <p>Die Datei wurde entschlüsselt. Der Inhalt wird jetzt freigegeben.</p>
+      <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--accent-amber);">Automatische Weiterleitung zur Datei...</p>
+      <a :href="nextUrl">Datei öffnen &rarr;</a>
+    </div>
+
+    <!-- Hint System -->
+    <div x-show="!solved" class="hint-section">
+      <div class="hint-label">Unterstützung</div>
+
+      <!-- Tier 1 Button -->
+      <button x-show="hintTier === 0" @click="hintTier = 1" class="btn-classified btn-hint">
+        Hilfe anfordern
+      </button>
+
+      <!-- Tier 1: Handler nudge -->
+      <div x-show="hintTier >= 1" x-transition class="handler-message">
+        <img src="/akte-nachtfalter/assets/ep01/images/handler-avatar.webp" class="avatar" alt="Händler" loading="lazy" onerror="this.style.display='none'">
+        <p>&laquo;Agentin, hier ist dein Händler. Das Foto zeigt einen Raum mit verschiedenen Gegenständen. Achten Sie besonders auf den Tisch. Da liegt etwas mit Zahlen drauf. Etwas, das ein Datum zeigen könnte.&raquo;</p>
+      </div>
+
+      <!-- Tier 2 Button -->
+      <button x-show="hintTier === 1" @click="hintTier = 2" class="btn-classified btn-hint">
+        Weitere Hilfe
+      </button>
+
+      <!-- Tier 2: Handler clearer -->
+      <div x-show="hintTier >= 2" x-transition class="handler-message">
+        <img src="/akte-nachtfalter/assets/ep01/images/handler-avatar.webp" class="avatar" alt="Händler" loading="lazy" onerror="this.style.display='none'">
+        <p>&laquo;Dein Händler nochmal. Auf dem Tisch liegt ein Kalenderblatt. Das Datum darauf ist das Passwort. Schauen Sie genau hin -- es ist ein bestimmter Tag im Februar. Geben Sie es als TT.MM. ein. Und Agentin... äh... kommt Ihnen das Datum vielleicht bekannt vor?&raquo;</p>
+      </div>
+
+      <!-- Tier 3 Button -->
+      <button x-show="hintTier === 2" @click="hintTier = 3" class="btn-classified btn-danger">
+        Notfall-Entschlüsselung
+      </button>
+
+      <!-- Tier 3: Carlos taunt -->
+      <div x-show="hintTier >= 3" x-transition class="carlos-message">
+        <img src="/assets/shared/carlos-avatar.webp" class="avatar" alt="C.S. -- Überwachungsaufnahme" loading="lazy">
+        <p>&laquo;Na, Agentin? Erkennst du dein eigenes Datum nicht? 06.02. -- ich hätte gedacht, das vergisst man nicht so leicht. Alles Gute übrigens. Haha. Na gut, nicht von mir. Von jemand anderem. Jemand, der sich viel Mühe gegeben hat.&raquo;</p>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Puzzle 3: Spiegelsaal (Visual Clue)
+    // Answer: 06.02.
+    // SHA-256 of "06.02.": 73457621a47eef8ddc3e7657e07e57aa877d46a22a4b213b54143dd06e6242af
+    function puzzlePage() {
+      return {
+        answer: '',
+        denied: false,
+        solved: false,
+        hintTier: 0,
+        correctHash: '73457621a47eef8ddc3e7657e07e57aa877d46a22a4b213b54143dd06e6242af',
+        nextUrl: '/akte-nachtfalter/nachtfalter-protokoll/',
+
+        async checkAnswer() {
+          if (!this.answer.trim()) return;
+          this.denied = false;
+          const normalized = this.answer.trim().toLowerCase().replace(/\s+/g, '');
+          const msgUint8 = new TextEncoder().encode(normalized);
+          const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+          if (hashHex === this.correctHash) {
+            this.solved = true;
+            // Auto-redirect after 4 seconds
+            setTimeout(() => {
+              window.location.href = this.nextUrl;
+            }, 4000);
+          } else {
+            this.denied = true;
+            setTimeout(() => { this.denied = false; }, 3000);
+          }
+        }
+      }
+    }
+  </script>
+</body>
+</html>

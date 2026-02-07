@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AGENTENPORTAL</title>
+  <link rel="stylesheet" href="/assets/css/classified.css">
+  <meta name="robots" content="noindex, nofollow">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.15.3/dist/cdn.min.js"></script>
+</head>
+<body class="spy-screen">
+  <main x-data="portalPage()" class="classified-container">
+
+    <!-- Header -->
+    <div class="classified-header">
+      <div class="classified-stamp">Klassifiziert</div>
+      <h1>Agentenportal</h1>
+      <div class="sector-name">Operation Velvet Viper</div>
+    </div>
+
+    <!-- Briefing -->
+    <div class="briefing">
+      <p>Willkommen im gesicherten Agentenportal.</p>
+      <p>Geben Sie Ihren Operationscode ein, um auf Ihre Mission zuzugreifen.</p>
+      <p class="signature">-- V.I.L.E. Intercept Division</p>
+    </div>
+
+    <!-- Code Input (hidden when solved) -->
+    <div x-show="!solved" class="code-entry">
+      <label style="font-size: 0.8rem; color: var(--accent-green); letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: 0.5rem;">
+        Operationscode eingeben:
+      </label>
+      <input
+        x-model="code"
+        @keydown.enter="checkCode()"
+        type="text"
+        placeholder="Code eingeben..."
+        class="input-terminal"
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
+      >
+      <button @click="checkCode()" class="btn-classified">
+        Zugang anfordern
+      </button>
+    </div>
+
+    <!-- Access Denied -->
+    <p x-show="denied" x-transition class="access-denied">
+      Zugriff verweigert -- Ungültiger Operationscode
+    </p>
+
+    <!-- Access Granted -->
+    <div x-show="solved" x-transition class="access-granted">
+      <h2>Zugriff gewährt</h2>
+      <p>Operationscode bestätigt. Ihre Mission wird geladen...</p>
+      <a :href="targetUrl">Mission starten &rarr;</a>
+    </div>
+
+  </main>
+
+  <script>
+    // Portal: code-entry page
+    // Routes map: normalized code -> SHA-256 hash -> target URL
+    function portalPage() {
+      return {
+        code: '',
+        denied: false,
+        solved: false,
+        targetUrl: '',
+
+        // Known routes: hash -> URL
+        routes: {
+          '1b4da9104084a3c75ecd65b9befb1e6239dc4b0246002ac37ce1cbcd6296e423': '/akte-nachtfalter/frequenz-sieben/'
+        },
+
+        async checkCode() {
+          if (!this.code.trim()) return;
+          this.denied = false;
+          const normalized = this.code.trim().toLowerCase().replace(/\s+/g, '');
+          const msgUint8 = new TextEncoder().encode(normalized);
+          const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+          if (this.routes[hashHex]) {
+            this.solved = true;
+            this.targetUrl = this.routes[hashHex];
+          } else {
+            this.denied = true;
+            setTimeout(() => { this.denied = false; }, 3000);
+          }
+        }
+      }
+    }
+  </script>
+</body>
+</html>

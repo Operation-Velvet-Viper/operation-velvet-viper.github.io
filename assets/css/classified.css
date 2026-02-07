@@ -1,0 +1,870 @@
+/* classified.css -- Shared spy theme for Operation Velvet Viper */
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Special+Elite&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap');
+
+:root {
+  --bg-classified: #1a1a1a;
+  --text-primary: #e0d8c8;
+  --text-classified: #c0392b;
+  --accent-green: #33ff33;
+  --accent-amber: #ffa500;
+  --font-terminal: 'Share Tech Mono', 'Courier New', monospace;
+  --font-document: 'Special Elite', 'Courier New', serif;
+  --font-warm: 'Crimson Pro', Georgia, serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body.spy-screen {
+  background-color: var(--bg-classified);
+  color: var(--text-primary);
+  font-family: var(--font-terminal);
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100dvh;
+  padding: 1rem;
+  overflow-x: hidden;
+  animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Scan line overlay */
+body.spy-screen::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.12) 50%
+  );
+  background-size: 100% 3px;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.35;
+  transition: opacity 1s ease;
+}
+
+/* ================================================
+   Layout
+   ================================================ */
+
+.classified-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* ================================================
+   Classified Document Stamps & Headers
+   ================================================ */
+
+.classified-stamp {
+  position: relative;
+  display: inline-block;
+  font-family: var(--font-terminal);
+  font-weight: bold;
+  color: var(--text-classified);
+  border: 3px solid var(--text-classified);
+  padding: 0.25em 0.5em;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  transform: rotate(-3deg);
+  opacity: 0.85;
+  margin: 1rem 0;
+}
+
+.classified-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(224, 216, 200, 0.2);
+}
+
+.classified-header h1 {
+  font-family: var(--font-terminal);
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.classified-header .sector-name {
+  font-size: 0.85rem;
+  color: var(--accent-amber);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* ================================================
+   Briefing Text
+   ================================================ */
+
+.briefing {
+  margin: 1.5rem 0;
+  font-family: var(--font-document);
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+
+.briefing p {
+  margin-bottom: 1rem;
+}
+
+.briefing .signature {
+  margin-top: 1.5rem;
+  font-style: italic;
+  color: var(--accent-green);
+  opacity: 0.8;
+}
+
+/* ================================================
+   Input Terminal & Buttons
+   ================================================ */
+
+.code-entry {
+  margin: 2rem 0;
+}
+
+.input-terminal {
+  width: 100%;
+  padding: 12px 16px;
+  font-family: var(--font-terminal);
+  font-size: 18px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--accent-green);
+  color: var(--accent-green);
+  border-radius: 0;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.input-terminal:focus {
+  border-color: var(--accent-amber);
+  box-shadow: 0 0 8px rgba(255, 165, 0, 0.3);
+}
+
+.input-terminal::placeholder {
+  color: rgba(51, 255, 51, 0.4);
+}
+
+.btn-classified {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  margin-top: 0.75rem;
+  font-family: var(--font-terminal);
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: transparent;
+  border: 2px solid var(--accent-amber);
+  color: var(--accent-amber);
+  cursor: pointer;
+  min-height: 48px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-classified:hover,
+.btn-classified:active {
+  background: rgba(255, 165, 0, 0.15);
+}
+
+.btn-classified:active {
+  background: rgba(255, 165, 0, 0.25);
+}
+
+.btn-classified.btn-hint {
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+  font-size: 14px;
+  padding: 10px;
+  margin-top: 1rem;
+}
+
+.btn-classified.btn-hint:hover,
+.btn-classified.btn-hint:active {
+  background: rgba(51, 255, 51, 0.1);
+}
+
+.btn-classified.btn-danger {
+  border-color: var(--text-classified);
+  color: var(--text-classified);
+  font-size: 14px;
+  padding: 10px;
+  margin-top: 1rem;
+}
+
+.btn-classified.btn-danger:hover,
+.btn-classified.btn-danger:active {
+  background: rgba(192, 57, 43, 0.15);
+}
+
+/* ================================================
+   Access Denied / Granted Messages
+   ================================================ */
+
+.access-denied {
+  color: var(--text-classified);
+  text-align: center;
+  font-size: 1.2em;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin: 1rem 0;
+  animation: flash 0.3s ease-in-out;
+}
+
+@keyframes flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.access-granted {
+  background: rgba(0, 50, 0, 0.3);
+  border: 1px solid var(--accent-green);
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+.access-granted h2 {
+  color: var(--accent-green);
+  font-size: 1.3rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.access-granted p {
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+
+.access-granted a {
+  display: inline-block;
+  color: var(--accent-amber);
+  text-decoration: none;
+  border: 1px solid var(--accent-amber);
+  padding: 8px 16px;
+  margin-top: 0.5rem;
+  transition: background 0.2s;
+}
+
+.access-granted a:hover {
+  background: rgba(255, 165, 0, 0.15);
+}
+
+/* ================================================
+   Handler Message
+   ================================================ */
+
+.handler-message {
+  background: rgba(0, 50, 0, 0.2);
+  border-left: 3px solid var(--accent-green);
+  padding: 1rem;
+  margin: 1rem 0;
+  overflow: hidden;
+}
+
+.handler-message .avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  float: left;
+  margin-right: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.handler-message p {
+  font-family: var(--font-document);
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+/* ================================================
+   Carlos Message
+   ================================================ */
+
+.carlos-message {
+  background: rgba(80, 0, 0, 0.2);
+  border-left: 3px solid var(--text-classified);
+  padding: 1rem;
+  margin: 1rem 0;
+  font-style: italic;
+  overflow: hidden;
+}
+
+.carlos-message .avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  float: left;
+  margin-right: 0.75rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid rgba(192, 57, 43, 0.5);
+}
+
+.carlos-message p {
+  font-family: var(--font-document);
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+/* ================================================
+   Hint Section
+   ================================================ */
+
+.hint-section {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(224, 216, 200, 0.15);
+}
+
+.hint-section .hint-label {
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(224, 216, 200, 0.4);
+  margin-bottom: 0.75rem;
+}
+
+/* ================================================
+   Redacted Text
+   ================================================ */
+
+.redacted {
+  background-color: #111;
+  color: #111;
+  padding: 0 0.25em;
+  cursor: default;
+  user-select: none;
+  transition: all 0.5s ease;
+}
+
+.redacted.revealed {
+  background-color: transparent;
+  color: var(--text-primary);
+}
+
+/* ================================================
+   Typewriter Animation
+   ================================================ */
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink-caret {
+  50% { border-color: transparent; }
+}
+
+.typewriter {
+  font-family: var(--font-terminal);
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid var(--accent-green);
+  animation: typing 2s steps(30) 0.5s forwards,
+             blink-caret 0.75s step-end infinite;
+  width: 0;
+}
+
+/* ================================================
+   Audio Player
+   ================================================ */
+
+.audio-section {
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+.intercepted-transmission {
+  border: 1px dashed var(--accent-amber);
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.intercepted-transmission p {
+  margin-bottom: 1rem;
+}
+
+.audio-player {
+  width: 100%;
+  margin-top: 1rem;
+  filter: sepia(0.3) hue-rotate(60deg);
+}
+
+/* ================================================
+   Cipher Display
+   ================================================ */
+
+.cipher-display {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(224, 216, 200, 0.2);
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  font-family: var(--font-document);
+  font-size: 1rem;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.cipher-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-family: var(--font-terminal);
+  font-size: 0.8rem;
+  overflow-x: auto;
+}
+
+.cipher-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 1.5rem 0;
+}
+
+.cipher-table th,
+.cipher-table td {
+  padding: 4px 6px;
+  text-align: center;
+  border: 1px solid rgba(224, 216, 200, 0.2);
+  min-width: 24px;
+}
+
+.cipher-table th {
+  color: var(--accent-amber);
+  font-weight: normal;
+}
+
+.cipher-table td {
+  color: var(--accent-green);
+}
+
+.cipher-table .label-cell {
+  text-align: right;
+  padding-right: 8px;
+  border: none;
+  color: rgba(224, 216, 200, 0.5);
+  font-size: 0.7rem;
+  min-width: 80px;
+}
+
+/* ================================================
+   Evidence Image
+   ================================================ */
+
+.evidence-image {
+  width: 100%;
+  margin: 1.5rem 0;
+  border: 2px solid rgba(224, 216, 200, 0.2);
+  filter: contrast(1.1) brightness(0.95);
+}
+
+.evidence-caption {
+  font-size: 0.8rem;
+  color: rgba(224, 216, 200, 0.4);
+  text-align: center;
+  margin-top: 0.5rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ================================================
+   Birthday Message Transition
+   ================================================ */
+
+body.birthday-transition {
+  background-color: var(--bg-classified);
+  color: var(--text-primary);
+  font-family: var(--font-terminal);
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100dvh;
+  padding: 1rem;
+  overflow-x: hidden;
+  animation: fadeIn 0.8s ease-out;
+  transition: background-color 2s ease, color 2s ease;
+}
+
+body.birthday-transition::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.12) 50%
+  );
+  background-size: 100% 3px;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.35;
+  transition: opacity 2s ease;
+}
+
+body.birthday-transition.phase-warm {
+  background-color: #2a2420;
+  color: #f0e6d3;
+}
+
+body.birthday-transition.phase-warm::before {
+  opacity: 0.15;
+}
+
+body.birthday-transition.phase-personal {
+  background-color: #3a3028;
+  color: #f5ede0;
+}
+
+body.birthday-transition.phase-personal::before {
+  opacity: 0;
+}
+
+.birthday-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Phase 1: Classified opening */
+.phase-classified-text {
+  font-family: var(--font-terminal);
+  transition: font-family 1s ease, color 1s ease;
+}
+
+.phase-classified-text .doc-header {
+  font-size: 0.85rem;
+  color: rgba(224, 216, 200, 0.5);
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+}
+
+.phase-classified-text .separator {
+  text-align: center;
+  margin: 1.5rem 0;
+  color: rgba(224, 216, 200, 0.3);
+  letter-spacing: 0.5em;
+}
+
+/* Phase 2: Transition text */
+.phase-transition-text {
+  font-family: var(--font-document);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #e8dcc8;
+  margin: 2rem 0;
+  transition: all 1s ease;
+}
+
+.phase-transition-text p {
+  margin-bottom: 1rem;
+}
+
+/* Phase 3: Personal birthday message */
+.phase-personal-text {
+  font-family: var(--font-warm);
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #f5ede0;
+  margin: 2rem 0;
+}
+
+.phase-personal-text p {
+  margin-bottom: 1.2rem;
+}
+
+.phase-personal-text .greeting {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #ffd700;
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.phase-personal-text .sign-off {
+  margin-top: 2rem;
+  font-style: italic;
+}
+
+.phase-personal-text .ps {
+  margin-top: 1.5rem;
+  font-size: 0.95rem;
+  color: rgba(245, 237, 224, 0.7);
+  font-style: italic;
+}
+
+/* Birthday stamp replacing classified stamp */
+.birthday-stamp {
+  display: inline-block;
+  font-family: var(--font-warm);
+  font-weight: 600;
+  color: #ffd700;
+  border: 3px solid #ffd700;
+  padding: 0.3em 0.6em;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  transform: rotate(-3deg);
+  font-size: 1.3rem;
+  text-align: center;
+  margin: 1.5rem auto;
+}
+
+.btn-continue {
+  display: block;
+  width: auto;
+  max-width: 200px;
+  margin: 3rem auto 2rem;
+  padding: 12px 24px;
+  font-family: var(--font-warm);
+  font-size: 1rem;
+  background: transparent;
+  border: 1px solid rgba(245, 237, 224, 0.3);
+  color: rgba(245, 237, 224, 0.6);
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.3s ease;
+  min-height: 48px;
+  line-height: 24px;
+}
+
+.btn-continue:hover {
+  border-color: rgba(245, 237, 224, 0.6);
+  color: rgba(245, 237, 224, 0.9);
+}
+
+/* ================================================
+   Echo Null (Series Teaser)
+   ================================================ */
+
+body.echo-null {
+  background-color: #0a0a0a;
+  color: var(--text-primary);
+  font-family: var(--font-terminal);
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100dvh;
+  padding: 1rem;
+  overflow-x: hidden;
+}
+
+body.echo-null::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.2) 50%
+  );
+  background-size: 100% 3px;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.echo-container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.echo-container .transmission-header {
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  color: var(--text-classified);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.echo-container .transmission-source {
+  font-size: 0.75rem;
+  color: rgba(224, 216, 200, 0.4);
+  margin-bottom: 2rem;
+}
+
+.echo-container .carlos-avatar-large {
+  width: 120px;
+  height: 120px;
+  border-radius: 4px;
+  border: 2px solid rgba(192, 57, 43, 0.5);
+  margin: 0 auto 2rem;
+  display: block;
+  filter: contrast(1.1) brightness(0.9);
+}
+
+.echo-container .carlos-text {
+  text-align: left;
+  font-family: var(--font-document);
+  font-size: 1rem;
+  line-height: 1.8;
+  font-style: italic;
+  color: var(--text-primary);
+  margin-bottom: 2rem;
+}
+
+.echo-container .carlos-text p {
+  margin-bottom: 1rem;
+}
+
+.echo-container .carlos-sig {
+  text-align: right;
+  color: var(--text-classified);
+  font-style: italic;
+  margin: 1.5rem 0;
+}
+
+.echo-container .dots {
+  color: rgba(224, 216, 200, 0.3);
+  letter-spacing: 0.5em;
+  margin: 1.5rem 0;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+.transmission-end {
+  font-size: 0.9rem;
+  letter-spacing: 0.2em;
+  color: var(--text-classified);
+  text-transform: uppercase;
+  animation: blink 2s ease-in-out infinite;
+  margin-top: 2rem;
+}
+
+.next-mission {
+  font-size: 0.75rem;
+  color: rgba(224, 216, 200, 0.3);
+  letter-spacing: 0.15em;
+  margin-top: 0.5rem;
+}
+
+.episode-footer {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(224, 216, 200, 0.1);
+  font-size: 0.7rem;
+  color: rgba(224, 216, 200, 0.2);
+  letter-spacing: 0.1em;
+  text-align: center;
+}
+
+/* ================================================
+   Typewriter for Echo Null (multi-line)
+   ================================================ */
+
+.typewriter-block {
+  opacity: 0;
+  animation: typewriterFadeIn 0.5s ease forwards;
+}
+
+@keyframes typewriterFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ================================================
+   Access Denied Page (root index.html)
+   ================================================ */
+
+.denied-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80dvh;
+  text-align: center;
+}
+
+.denied-page .lock-icon {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.6;
+}
+
+.denied-page h1 {
+  font-size: 1.2rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-classified);
+  margin-bottom: 1rem;
+}
+
+.denied-page p {
+  font-size: 0.9rem;
+  color: rgba(224, 216, 200, 0.4);
+  max-width: 300px;
+}
+
+.denied-page .blink-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 1.2em;
+  background-color: var(--accent-green);
+  animation: blink 1s step-end infinite;
+  vertical-align: text-bottom;
+  margin-left: 4px;
+}
+
+/* ================================================
+   Responsive: 320px - 428px (Mobile Range)
+   ================================================ */
+
+@media (max-width: 428px) {
+  body.spy-screen,
+  body.birthday-transition,
+  body.echo-null {
+    padding: 0.75rem;
+    font-size: 15px;
+  }
+
+  .classified-container,
+  .birthday-container,
+  .echo-container {
+    padding: 0.5rem;
+  }
+
+  .classified-stamp {
+    font-size: 0.85rem;
+  }
+
+  .input-terminal {
+    font-size: 16px;
+  }
+
+  .cipher-table th,
+  .cipher-table td {
+    padding: 3px 4px;
+    font-size: 0.7rem;
+    min-width: 20px;
+  }
+
+  .cipher-table .label-cell {
+    font-size: 0.6rem;
+    min-width: 60px;
+  }
+
+  .handler-message,
+  .carlos-message {
+    padding: 0.75rem;
+  }
+
+  .handler-message .avatar,
+  .carlos-message .avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .echo-container .carlos-avatar-large {
+    width: 96px;
+    height: 96px;
+  }
+}
