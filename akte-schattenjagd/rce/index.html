@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RCE CONSOLE</title>
+  <link rel="stylesheet" href="/assets/css/classified.css">
+  <meta name="robots" content="noindex, nofollow">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.15.3/dist/cdn.min.js"></script>
+  <style>
+    .terminal {
+      background: #0a0a0a;
+      border: 1px solid var(--accent-green);
+      padding: 1rem;
+      font-family: var(--font-terminal);
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--accent-green);
+      min-height: 50dvh;
+      overflow-y: auto;
+    }
+
+    .terminal-line {
+      margin-bottom: 0.25rem;
+      word-break: break-word;
+    }
+
+    .terminal-line.system {
+      color: rgba(51, 255, 51, 0.5);
+    }
+
+    .terminal-line.amber {
+      color: var(--accent-amber);
+    }
+
+    .terminal-line.red {
+      color: var(--text-classified);
+    }
+
+    .terminal-line.success {
+      color: var(--accent-green);
+      font-weight: bold;
+    }
+
+    .terminal-input-row {
+      display: flex;
+      align-items: center;
+      margin-top: 0.5rem;
+    }
+
+    .terminal-prompt {
+      color: var(--accent-green);
+      margin-right: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .terminal-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--accent-green);
+      font-family: var(--font-terminal);
+      font-size: 14px;
+      caret-color: var(--accent-green);
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .terminal-input::placeholder {
+      color: rgba(51, 255, 51, 0.3);
+    }
+
+    .progress-bar {
+      color: var(--accent-amber);
+      animation: loading 1.5s steps(20) forwards;
+      overflow: hidden;
+      white-space: nowrap;
+      width: 0;
+      display: inline-block;
+    }
+
+    @keyframes loading {
+      to { width: 22ch; }
+    }
+
+    .download-section {
+      margin-top: 1.5rem;
+      text-align: center;
+      padding: 1.5rem;
+      border: 1px solid var(--accent-green);
+      background: rgba(0, 50, 0, 0.3);
+    }
+
+    .download-section h2 {
+      color: var(--accent-green);
+      font-family: var(--font-terminal);
+      font-size: 1.1rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .download-btn {
+      display: inline-block;
+      padding: 14px 28px;
+      font-family: var(--font-terminal);
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      background: transparent;
+      border: 2px solid var(--accent-amber);
+      color: var(--accent-amber);
+      cursor: pointer;
+      text-decoration: none;
+      min-height: 48px;
+      transition: background-color 0.2s ease;
+    }
+
+    .download-btn:hover,
+    .download-btn:active {
+      background: rgba(255, 165, 0, 0.15);
+    }
+  </style>
+</head>
+<body class="spy-screen">
+  <main x-data="rceTerminal()" class="classified-container">
+
+    <!-- Terminal Header -->
+    <div style="text-align: center; margin-bottom: 1rem;">
+      <div style="font-size: 0.75rem; color: rgba(224,216,200,0.3); letter-spacing: 0.15em; text-transform: uppercase;">Operation Velvet Viper</div>
+      <div style="font-family: var(--font-terminal); font-size: 1rem; color: var(--accent-green); letter-spacing: 0.2em; margin-top: 0.5rem;">RCE CONSOLE</div>
+      <div style="font-size: 0.7rem; color: var(--accent-amber); letter-spacing: 0.1em; margin-top: 0.25rem;">REMOTE CODE EXECUTION</div>
+    </div>
+
+    <!-- Terminal -->
+    <div class="terminal" @click="$refs.input && $refs.input.focus()">
+
+      <!-- Output lines -->
+      <template x-for="(line, i) in output" :key="i">
+        <div class="terminal-line" :class="line.type" x-html="line.text"></div>
+      </template>
+
+      <!-- Input row (hidden after success) -->
+      <div x-show="!completed" class="terminal-input-row">
+        <span class="terminal-prompt">&gt;</span>
+        <input
+          x-ref="input"
+          x-model="command"
+          @keydown.enter="executeCommand()"
+          type="text"
+          class="terminal-input"
+          placeholder="Befehl eingeben..."
+          autocomplete="off"
+          autocapitalize="none"
+          spellcheck="false"
+          :disabled="processing"
+        >
+      </div>
+    </div>
+
+    <!-- Download Section (appears after success) -->
+    <div x-show="completed" x-transition class="download-section">
+      <h2>Zugriff gewährt</h2>
+      <p style="color: var(--text-primary); margin-bottom: 1rem;">Dateien entschlüsselt. Download bereit.</p>
+      <a
+        href="https://drive.google.com/file/d/1dKQ2n-s8AuLyCjjh37taT12I8tNW119_/view"
+        target="_blank"
+        rel="noopener"
+        class="download-btn"
+      >
+        Tickets herunterladen
+      </a>
+    </div>
+
+    <!-- Episode Footer -->
+    <div x-show="completed" x-transition class="episode-footer">
+      operation velvet viper — episode 2
+    </div>
+
+  </main>
+
+  <script>
+    function rceTerminal() {
+      return {
+        command: '',
+        output: [],
+        completed: false,
+        processing: false,
+        connected: false,
+        scanned: false,
+        authPrompt: false,
+
+        init() {
+          this.print('VELVET VIPER SYSTEMS — RCE CONSOLE', 'system');
+          this.print('════════════════════════════════════', 'system');
+          this.print('Standort: SCHAUSPIELHAUS BOCHUM', 'system');
+          this.print('Status: GESICHERT', 'red');
+          this.print('════════════════════════════════════', 'system');
+          this.print('');
+          this.print('Tippe <span style="color:var(--accent-amber)">hilfe</span> für verfügbare Befehle.', 'system');
+        },
+
+        print(text, type) {
+          this.output.push({ text: text || '&nbsp;', type: type || '' });
+          this.$nextTick(() => {
+            const terminal = this.$el.querySelector('.terminal');
+            if (terminal) terminal.scrollTop = terminal.scrollHeight;
+          });
+        },
+
+        async executeCommand() {
+          if (this.processing || !this.command.trim()) return;
+          const cmd = this.command.trim();
+          const cmdLower = cmd.toLowerCase().replace(/\s+/g, '');
+          this.print('&gt; ' + cmd, '');
+          this.command = '';
+
+          // Auth prompt mode — waiting for password
+          if (this.authPrompt) {
+            await this.handleAuth(cmd);
+            return;
+          }
+
+          // Commands
+          if (cmdLower === 'hilfe' || cmdLower === 'help') {
+            this.showHelp();
+          } else if (cmdLower === 'scan') {
+            await this.doScan();
+          } else if (cmdLower.startsWith('connect') || cmdLower === 'verbinden') {
+            await this.doConnect();
+          } else if (cmdLower === 'execute' || cmdLower === 'ausführen' || cmdLower === 'rce') {
+            await this.doExecute();
+          } else if (cmdLower === 'status') {
+            this.showStatus();
+          } else if (cmdLower === 'carlos') {
+            this.print('');
+            this.print('Schön, dass du bis hierher gekommen bist. — C.S.', 'amber');
+          } else if (cmdLower === 'händler' || cmdLower === 'handler') {
+            this.print('');
+            this.print('Äh... das ist nicht mein System. Ich bin nur der Handler.', 'system');
+          } else if (cmdLower === 'nachtfalter') {
+            this.print('');
+            this.print('Codename erkannt. Willkommen zurück, Agentin.', 'amber');
+          } else {
+            this.print('Befehl nicht erkannt. Tippe <span style="color:var(--accent-amber)">hilfe</span> für Optionen.', 'red');
+          }
+        },
+
+        showHelp() {
+          this.print('');
+          this.print('Verfügbare Befehle:', 'amber');
+          this.print('  scan      — Systeme in der Nähe scannen', 'system');
+          this.print('  connect   — Mit Zielsystem verbinden', 'system');
+          this.print('  execute   — Remote Code Execution starten', 'system');
+          this.print('  status    — Missionsstatus anzeigen', 'system');
+          this.print('');
+        },
+
+        showStatus() {
+          this.print('');
+          this.print('MISSIONSSTATUS:', 'amber');
+          this.print('  Scan:       ' + (this.scanned ? '✓ Abgeschlossen' : '○ Ausstehend'), this.scanned ? 'success' : 'system');
+          this.print('  Verbindung: ' + (this.connected ? '✓ Hergestellt' : '○ Ausstehend'), this.connected ? 'success' : 'system');
+          this.print('  RCE:        ' + (this.completed ? '✓ Ausgeführt' : '○ Ausstehend'), this.completed ? 'success' : 'system');
+          this.print('');
+        },
+
+        async doScan() {
+          this.processing = true;
+          this.print('');
+          this.print('Scanne Umgebung...', 'system');
+          await this.delay(800);
+          this.print('[████████████████████] 100%', 'amber');
+          await this.delay(400);
+          this.print('');
+          this.print('1 System gefunden:', 'success');
+          this.print('  SCHAUSPIELHAUS-BOCHUM — Port 443 — GESICHERT', 'amber');
+          this.print('');
+          this.scanned = true;
+          this.processing = false;
+        },
+
+        async doConnect() {
+          if (!this.scanned) {
+            this.print('Kein Zielsystem bekannt. Führe zuerst <span style="color:var(--accent-amber)">scan</span> aus.', 'red');
+            return;
+          }
+          if (this.connected) {
+            this.print('Bereits verbunden mit SCHAUSPIELHAUS-BOCHUM.', 'system');
+            return;
+          }
+          this.processing = true;
+          this.print('');
+          this.print('Verbinde mit SCHAUSPIELHAUS-BOCHUM...', 'system');
+          await this.delay(1000);
+          this.print('Sicherheitsprotokoll erkannt...', 'system');
+          await this.delay(600);
+          this.print('Verbindung hergestellt.', 'success');
+          this.print('');
+          this.connected = true;
+          this.processing = false;
+        },
+
+        async doExecute() {
+          if (!this.connected) {
+            this.print('Keine Verbindung. Führe zuerst <span style="color:var(--accent-amber)">scan</span> und <span style="color:var(--accent-amber)">connect</span> aus.', 'red');
+            return;
+          }
+          this.print('');
+          this.print('⚠ WARNUNG: Remote Code Execution erfordert Autorisierung.', 'red');
+          this.print('');
+          this.print('Autorisierungscode eingeben:', 'amber');
+          this.authPrompt = true;
+        },
+
+        async handleAuth(code) {
+          const normalized = code.trim().toLowerCase().replace(/\s+/g, '');
+          const msgUint8 = new TextEncoder().encode(normalized);
+          const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+          if (hashHex === 'b1051bdbdeb8748565a664751d99f9a4d128322b0a2e78b2864e34f511f9f660') {
+            this.processing = true;
+            this.authPrompt = false;
+            this.print('');
+            this.print('Autorisierung... BESTÄTIGT', 'success');
+            await this.delay(600);
+            this.print('');
+            this.print('Remote Code Execution wird ausgeführt...', 'amber');
+            await this.delay(1000);
+            this.print('[████████████████████] 100%', 'amber');
+            await this.delay(500);
+            this.print('');
+            this.print('RCE ERFOLGREICH', 'success');
+            this.print('Dateien entschlüsselt.', 'success');
+            await this.delay(1500);
+
+            // Carlos' message — typewriter in terminal
+            this.print('');
+            this.print('════════════════════════════════════', 'system');
+            this.print('EINGEHENDE ÜBERTRAGUNG — C.S.', 'red');
+            this.print('════════════════════════════════════', 'system');
+            await this.delay(1500);
+            this.print('');
+            this.print('Agentin.', 'amber');
+            await this.delay(2000);
+            this.print('');
+            this.print('Du hast mich quer durchs Ruhrgebiet verfolgt.', 'amber');
+            await this.delay(1500);
+            this.print('Durch S-Bahnen. Durch Restaurants. Bis hierher.', 'amber');
+            await this.delay(2000);
+            this.print('');
+            this.print('Nicht schlecht. Ehrlich.', 'amber');
+            await this.delay(2500);
+            this.print('');
+            this.print('Aber lass mich dir etwas verraten.', 'amber');
+            await this.delay(2000);
+            this.print('');
+            this.print('Du hast mich nicht gefunden.', 'amber');
+            await this.delay(2500);
+            this.print('Ich habe dich hierher geführt.', 'amber');
+            await this.delay(2000);
+            this.print('');
+            this.print('Jede Zahl. Jede Station. Jeder Schritt.', 'amber');
+            await this.delay(1500);
+            this.print('Alles geplant.', 'amber');
+            await this.delay(3000);
+            this.print('');
+            this.print('Genieß den Abend, Agentin. Du hast ihn dir verdient.', 'amber');
+            await this.delay(2500);
+            this.print('');
+            this.print('Wir sehen uns. Früher als du denkst.', 'system');
+            await this.delay(2000);
+            this.print('');
+            this.print('— C.S.', 'red');
+            this.print('');
+            this.print('════════════════════════════════════', 'system');
+            await this.delay(1500);
+
+            this.print('');
+            this.print('Download verfügbar.', 'success');
+            this.print('');
+            this.completed = true;
+            this.processing = false;
+          } else {
+            this.print('Autorisierung fehlgeschlagen: "' + code + '"', 'red');
+            this.print('');
+            this.print('Autorisierungscode eingeben:', 'amber');
+          }
+        },
+
+        delay(ms) {
+          return new Promise(resolve => setTimeout(resolve, ms));
+        }
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KLASSIFIZIERT</title>
+  <link rel="stylesheet" href="/assets/css/classified.css">
+  <meta name="robots" content="noindex, nofollow">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.15.3/dist/cdn.min.js"></script>
+</head>
+<body class="spy-screen">
+  <main x-data="puzzlePage()" class="classified-container">
+
+    <!-- Header -->
+    <div class="classified-header">
+      <div class="classified-stamp">Klassifiziert</div>
+      <h1>Operation Schattenjagd</h1>
+      <div class="sector-name">Signal Herz</div>
+    </div>
+
+    <!-- Briefing -->
+    <div class="briefing">
+      <p>Agentin,</p>
+      <p>wir haben eine verschlüsselte Nachricht von Carlos Sandiego an einen unbekannten Kontakt abgefangen. Carlos hat einen Treffpunkt für heute Abend vereinbart.</p>
+      <p>Die Nachricht enthält eine codierte Zahlensequenz. Entschlüsseln Sie den Namen des Treffpunkts.</p>
+    </div>
+
+    <!-- Cipher Display -->
+    <div class="cipher-display">
+      <p style="font-size: 0.8rem; color: var(--accent-amber); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;">Abgefangene Übertragung — Signal Herz</p>
+      <p style="font-size: 0.75rem; color: rgba(224,216,200,0.5); margin-bottom: 1rem;">QUELLE: C.S. &bull; ZIEL: UNBEKANNT</p>
+      <p style="margin-bottom: 0.5rem;">Treffpunkt heute Abend:</p>
+      <p style="font-family: var(--font-terminal); font-size: 1.4rem; color: var(--accent-green); letter-spacing: 0.3em; text-align: center; margin: 1.5rem 0;">2 — 12 — 15 — 14 — 4 — 9 — 5 — 19</p>
+      <p style="font-size: 0.85rem; color: rgba(224,216,200,0.6);">Adresse folgt bei Entschlüsselung.</p>
+    </div>
+
+    <!-- Answer Input (hidden when solved) -->
+    <div x-show="!solved" class="code-entry">
+      <label style="font-size: 0.8rem; color: var(--accent-green); letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: 0.5rem;">
+        Treffpunkt eingeben:
+      </label>
+      <input
+        x-model="answer"
+        @keydown.enter="checkAnswer()"
+        type="text"
+        placeholder="Name des Treffpunkts..."
+        class="input-terminal"
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
+      >
+      <button @click="checkAnswer()" class="btn-classified">
+        Entschlüsseln
+      </button>
+    </div>
+
+    <!-- Access Denied -->
+    <p x-show="denied" x-transition class="access-denied">
+      Zugriff verweigert — Analyse fehlgeschlagen
+    </p>
+
+    <!-- Access Granted -->
+    <div x-show="solved" x-transition class="access-granted">
+      <h2>Zugriff gewährt</h2>
+      <p>Treffpunkt identifiziert.</p>
+      <p style="font-family: var(--font-terminal); font-size: 1.1rem; color: var(--accent-amber); letter-spacing: 0.1em; margin: 1rem 0;">BLONDIES<br>Hattinger Str. 80<br>44789 Bochum</p>
+      <p>Carlos hat dort für heute Abend einen Tisch reserviert. Begeben Sie sich zum Zielort und observieren Sie die Lage.</p>
+      <p style="margin-top: 1rem; font-size: 0.85rem; color: rgba(224,216,200,0.6);">Weitere Instruktionen folgen vor Ort.</p>
+      <p class="signature" style="color: var(--accent-green); font-style: italic;">— Dein Händler</p>
+    </div>
+
+    <!-- Hint System -->
+    <div x-show="!solved" class="hint-section">
+      <div class="hint-label">Unterstützung</div>
+
+      <!-- Tier 1 Button -->
+      <button x-show="hintTier === 0" @click="hintTier = 1" class="btn-classified btn-hint">
+        Hilfe anfordern
+      </button>
+
+      <!-- Tier 1: Handler nudge -->
+      <div x-show="hintTier >= 1" x-transition class="handler-message">
+        <img src="/akte-nachtfalter/assets/ep01/images/handler-avatar.webp" class="avatar" alt="Händler" loading="lazy" onerror="this.style.display='none'">
+        <p>&laquo;Agentin, hier ist dein Händler. Die Zahlen sind keine Koordinaten. Sie sind ein chiffrierter Code. Carlos liebt einfache, elegante Verschlüsselungen.&raquo;</p>
+      </div>
+
+      <!-- Tier 2 Button -->
+      <button x-show="hintTier === 1" @click="hintTier = 2" class="btn-classified btn-hint">
+        Weitere Hilfe
+      </button>
+
+      <!-- Tier 2: Handler clearer -->
+      <div x-show="hintTier >= 2" x-transition class="handler-message">
+        <img src="/akte-nachtfalter/assets/ep01/images/handler-avatar.webp" class="avatar" alt="Händler" loading="lazy" onerror="this.style.display='none'">
+        <p>&laquo;Also, äh... technisch gesehen: Jede Zahl steht für einen Buchstaben. A ist 1, B ist 2, C ist 3... Sie verstehen das Prinzip? Setzen Sie die Buchstaben zusammen — es ergibt einen Namen.&raquo;</p>
+      </div>
+
+      <!-- Tier 3 Button -->
+      <button x-show="hintTier === 2" @click="hintTier = 3" class="btn-classified btn-danger">
+        Notfall-Entschlüsselung
+      </button>
+
+      <!-- Tier 3: Carlos taunt -->
+      <div x-show="hintTier >= 3" x-transition class="carlos-message">
+        <img src="/assets/shared/carlos-avatar.webp" class="avatar" alt="C.S. — Überwachungsaufnahme" loading="lazy">
+        <p>&laquo;Zu schwer? Es heißt BLONDIES. Ein Restaurant. Hattinger Straße 80. Sei pünktlich — ich hasse es, auf Leute zu warten. Haha.&raquo;</p>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Puzzle: Signal Herz (Number-to-Letter Cipher)
+    function puzzlePage() {
+      return {
+        answer: '',
+        denied: false,
+        solved: false,
+        hintTier: 0,
+        correctHash: 'fb661743454cfd70fb87a103fb6232a4f8455c10dbd331e6612039e4bbece624',
+
+        async checkAnswer() {
+          if (!this.answer.trim()) return;
+          this.denied = false;
+          const normalized = this.answer.trim().toLowerCase().replace(/\s+/g, '');
+          const msgUint8 = new TextEncoder().encode(normalized);
+          const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+          if (hashHex === this.correctHash) {
+            this.solved = true;
+          } else {
+            this.denied = true;
+            setTimeout(() => { this.denied = false; }, 3000);
+          }
+        }
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KLASSIFIZIERT</title>
+  <link rel="stylesheet" href="/assets/css/classified.css">
+  <meta name="robots" content="noindex, nofollow">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.15.3/dist/cdn.min.js"></script>
+</head>
+<body class="spy-screen">
+  <main x-data="puzzlePage()" class="classified-container">
+
+    <!-- Header -->
+    <div class="classified-header">
+      <div class="classified-stamp">Abgefangen</div>
+      <h1>Operation Schattenjagd</h1>
+      <div class="sector-name">Fragment — Zwischenhalt</div>
+    </div>
+
+    <!-- Briefing -->
+    <div class="briefing">
+      <p>Agentin,</p>
+      <p>wir haben ein Fragment aus Carlos' Route entschlüsselt. Er hat einen Zwischenhalt eingelegt — an einem Feld.</p>
+    </div>
+
+    <!-- Riddle Display -->
+    <div class="cipher-display">
+      <p style="font-size: 0.8rem; color: var(--accent-amber); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;">Abgefangenes Fragment</p>
+      <p style="font-family: var(--font-document); font-size: 1.05rem; line-height: 1.8; color: var(--text-primary);">
+        Carlos' Spur führt zu einem Feld.<br>
+        Kein Feld aus Gras — ein Feld voller Ähren.<br>
+        Wo die Ähren wachsen, steigst du aus.
+      </p>
+      <p style="font-size: 0.8rem; color: rgba(224,216,200,0.5); margin-top: 1rem;">Wie heißt die Haltestelle?</p>
+    </div>
+
+    <!-- Answer Input (hidden when solved) -->
+    <div x-show="!solved" class="code-entry">
+      <label style="font-size: 0.8rem; color: var(--accent-green); letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: 0.5rem;">
+        Haltestelle eingeben:
+      </label>
+      <input
+        x-model="answer"
+        @keydown.enter="checkAnswer()"
+        type="text"
+        placeholder="Name der Haltestelle..."
+        class="input-terminal"
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
+      >
+      <button @click="checkAnswer()" class="btn-classified">
+        Bestätigen
+      </button>
+    </div>
+
+    <!-- Access Denied -->
+    <p x-show="denied" x-transition class="access-denied">
+      Zugriff verweigert — Haltestelle nicht erkannt
+    </p>
+
+    <!-- Access Granted -->
+    <div x-show="solved" x-transition class="access-granted">
+      <h2>Fragment entschlüsselt</h2>
+      <p style="font-family: var(--font-terminal); font-size: 1.1rem; color: var(--accent-amber); letter-spacing: 0.1em; margin: 1rem 0;">BOCHUM EHRENFELD</p>
+      <p>Carlos ist hier ausgestiegen. Steig aus und folge seiner Spur.</p>
+      <p style="margin-top: 1.5rem; font-size: 0.85rem; color: rgba(224,216,200,0.6);">Aber wo genau ist er hin? Wir haben eine weitere Übertragung abgefangen:</p>
+      <a href="/akte-schattenjagd/signal-herz/" style="margin-top: 1rem;">Nächstes Fragment öffnen →</a>
+    </div>
+
+    <!-- Hint System -->
+    <div x-show="!solved" class="hint-section">
+      <div class="hint-label">Unterstützung</div>
+
+      <!-- Tier 1 Button -->
+      <button x-show="hintTier === 0" @click="hintTier = 1" class="btn-classified btn-hint">
+        Hilfe anfordern
+      </button>
+
+      <!-- Tier 1: Handler nudge -->
+      <div x-show="hintTier >= 1" x-transition class="handler-message">
+        <img src="/akte-nachtfalter/assets/ep01/images/handler-avatar.webp" class="avatar" alt="Händler" loading="lazy" onerror="this.style.display='none'">
+        <p>&laquo;Agentin, denk an Getreide. Ähren. Wie klingt das, wenn man es schnell ausspricht? Und dann... ein Feld.&raquo;</p>
+      </div>
+
+      <!-- Tier 2 Button -->
+      <button x-show="hintTier === 1" @click="hintTier = 2" class="btn-classified btn-hint">
+        Weitere Hilfe
+      </button>
+
+      <!-- Tier 2: Handler clearer -->
+      <div x-show="hintTier >= 2" x-transition class="handler-message">
+        <img src="/akte-nachtfalter/assets/ep01/images/handler-avatar.webp" class="avatar" alt="Händler" loading="lazy" onerror="this.style.display='none'">
+        <p>&laquo;Also... Ähren klingt wie Ehren. Und ein Feld ist ein Feld. Setz die beiden zusammen — es ist eine Haltestelle in Bochum.&raquo;</p>
+      </div>
+
+      <!-- Tier 3 Button -->
+      <button x-show="hintTier === 2" @click="hintTier = 3" class="btn-classified btn-danger">
+        Notfall-Entschlüsselung
+      </button>
+
+      <!-- Tier 3: Carlos taunt -->
+      <div x-show="hintTier >= 3" x-transition class="carlos-message">
+        <img src="/assets/shared/carlos-avatar.webp" class="avatar" alt="C.S. — Überwachungsaufnahme" loading="lazy">
+        <p>&laquo;Ehrenfeld. Bochum Ehrenfeld. Steig aus. Und beeil dich — ich warte nicht gern.&raquo;</p>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Puzzle: Ehrenfeld (Ähren + Feld wordplay)
+    function puzzlePage() {
+      return {
+        answer: '',
+        denied: false,
+        solved: false,
+        hintTier: 0,
+        correctHashes: [
+          'f99fbd226571e28826d074f3588e102bf57b3d0e86b2af7e98b6019b3c62b544',
+          '646558a10cb81ae0ecf8452acd5b3986d3fef9b5df4f4009127f426d14600d36'
+        ],
+
+        async checkAnswer() {
+          if (!this.answer.trim()) return;
+          this.denied = false;
+          const normalized = this.answer.trim().toLowerCase().replace(/\s+/g, '');
+          const msgUint8 = new TextEncoder().encode(normalized);
+          const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+          if (this.correctHashes.includes(hashHex)) {
+            this.solved = true;
+          } else {
+            this.denied = true;
+            setTimeout(() => { this.denied = false; }, 3000);
+          }
+        }
+      }
+    }
+  </script>
+</body>
+</html>
